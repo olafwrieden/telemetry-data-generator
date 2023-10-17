@@ -1,4 +1,4 @@
-# Telemetry Generator
+# Telemetry Data Generator
 
 This is a simple telemetry generator that can be used to generate telemetry data for testing purposes. It was built for the Azure Data Explorer Microhack as a replacement for the IoT Central dependency.
 
