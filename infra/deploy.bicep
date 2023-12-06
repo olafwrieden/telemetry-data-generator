@@ -1,23 +1,26 @@
 @description('Unique Suffix')
-param uniqueSuffix string = substring(uniqueString(resourceGroup().id), 0, 6)
-
+param uniqueSuffix string = substring(uniqueString(resourceGroup().id), 0, 4)
 @description('The name of the function app')
 param functionAppName string = 'datagenerator${uniqueSuffix}'
 @description('The location of the resources')
 param location string = resourceGroup().location
-@description('The name of the storage account')
+@description('The name of the Storage Account')
 param storageAccountName string = 'datagenerator${uniqueSuffix}'
-@description('The SKU of the storage account')
-param storageAccountSku string = 'Standard_GRS'
-@description('The name of the Event Hub namespace')
-param eventHubNamespaceName string = 'evnamespace${uniqueSuffix}'
+@description('The SKU of the Storage Account')
+@allowed([
+  'Standard_LRS'
+  'Standard_ZRS'
+])
+param storageAccountSku string = 'Standard_LRS'
+@description('The name of the Event Hub Namespace')
+param eventHubNamespaceName string = 'datagenerator${uniqueSuffix}'
 @description('The name of the Event Hub')
 param eventHubName string = 'iotdata'
 
 @description('The name of the authorization rule for the Event Hub')
 var eventHubAuthRuleName = 'FunctionAppSendKey'
 
-@description('The Event Hub namespace')
+@description('The Event Hub Namespace')
 resource eventHubNamespace 'Microsoft.EventHub/namespaces@2023-01-01-preview' = {
   name: eventHubNamespaceName
   location: location
@@ -51,7 +54,7 @@ resource eventHubSendRule 'Microsoft.EventHub/namespaces/eventhubs/authorization
   }
 }
 
-@description('The App Service Plan for the function app')
+@description('The App Service Plan for the Function App')
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: '${functionAppName}-plan'
   location: location
@@ -61,7 +64,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   }
 }
 
-@description('The storage account for the function app')
+@description('The Storage Account for the Function App')
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
   location: location
@@ -74,7 +77,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
 }
 
-@description('The function app')
+@description('The Function App')
 resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
   name: functionAppName
   location: location
@@ -88,13 +91,16 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
         {
           name: 'AzureWebJobsStorage'
           value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageAccount.listKeys().keys[0].value};'
-        }, {
+        }
+        {
           name: 'EventHubConnection'
           value: eventHubSendRule.listKeys().primaryConnectionString
-        }, {
+        }
+        {
           name: 'FUNCTIONS_EXTENSION_VERSION'
           value: '4'
-        }, {
+        }
+        {
           name: 'FUNCTIONS_WORKER_RUNTIME'
           value: 'node'
         }
@@ -103,7 +109,8 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
   }
 }
 
-resource functionAppName_web 'Microsoft.Web/sites/sourcecontrols@2022-09-01' = {
+@description('The source control for the Function App project')
+resource functionAppProject 'Microsoft.Web/sites/sourcecontrols@2022-09-01' = {
   parent: functionApp
   name: 'web'
   properties: {
