@@ -73,6 +73,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
   kind: 'StorageV2'
   properties: {
+    minimumTlsVersion: 'TLS1_2'
     accessTier: 'Hot'
   }
 }
@@ -110,7 +111,7 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
 }
 
 @description('The source control for the Function App project')
-resource functionAppProject 'Microsoft.Web/sites/sourcecontrols@2022-09-01' = {
+resource functionAppProject 'Microsoft.Web/sites/sourcecontrols@2022-03-01' = {
   parent: functionApp
   name: 'web'
   properties: {
