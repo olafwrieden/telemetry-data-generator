@@ -2,6 +2,7 @@ import { InvocationContext, Timer, app, output } from "@azure/functions";
 import { DEVICE_IDS } from "../deviceIds";
 import { generate } from "../generator";
 import { Device } from "../types";
+import { v4 } from "uuid";
 
 export async function TelemetryGenerator(
   myTimer: Timer,
@@ -22,6 +23,7 @@ export async function TelemetryGenerator(
     schema: "default@v1",
     enqueuedTime: new Date(),
     templateId: "dtmi:ltifbs50b:mecybcwqm",
+    telemetryId: v4(),
   }));
 
   // context.log(output);
