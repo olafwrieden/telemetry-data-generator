@@ -2,13 +2,17 @@
 
 This is a simple telemetry generator that can be used to generate telemetry data for testing purposes. It was built for the Azure Data Explorer Microhack as a replacement for the IoT Central dependency.
 
+## Deploy to Azure
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Folafwrieden%2Ftelemetry-data-generator%2Fmain%2Finfra%2Fmain.json)
+
 ## How it works
 
 The generator simulates telemetry from 30 devices whose ids are defined in the `src/deviceIds.ts` file. We want the generator to emit payloads for the same simulated devices each time, thus we hardcode the device ids to keep them consistent between runs.
 
-Every 1 minute, the `functions/TelemetryGenerator.ts` runs and emits a payload for each device ID. The payload is a JSON object which matches the expected format for the IoT Central API.
+Every 1 minute, the `src/functions/TelemetryGenerator.ts` runs and emits a payload for each device ID. The payload is a JSON object which matches the expected format for the IoT Central API.
 
-The payload array is then written onto the Event Hub for later ingestion into Azure Data Explorer (or other downstream systems).
+The payload array is then written onto the Event Hub for later ingestion into a KQL Database (or other downstream system).
 
 ## How to use
 
